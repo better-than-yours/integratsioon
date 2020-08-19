@@ -8,9 +8,11 @@ import {
   MenuItem,
   FormControlLabel,
   Checkbox,
+  LinearProgress,
 } from "@material-ui/core";
-import { map, uniq } from "lodash";
-import { useParams, withRouter } from "react-router-dom";
+import map from "lodash/map";
+import uniq from "lodash/uniq";
+import { useLocation, withRouter } from "react-router-dom";
 import { History } from "history";
 
 async function getData<T>(url: string): Promise<T> {
@@ -36,12 +38,13 @@ interface Props {
 }
 
 function App(props: Props) {
-  let { location, level } = useParams();
+  const query = new URLSearchParams(useLocation().search);
   const [filter, setFilter] = useState<Filter>({
-    location: location || "Tallinn",
-    level: level || "A1",
+    location: query.get("location") || "Tallinn",
+    level: query.get("level") || "A1",
     onlyWithFreePlaces: true,
   });
+  const [isLoading, setIsLoading] = useState(true);
   const [levels, setLevels] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -52,6 +55,15 @@ function App(props: Props) {
       getCourses();
     }
   }, [courses.length]);
+
+  useEffect(() => {
+    if (
+      query.get("location") !== filter.location ||
+      query.get("level") !== filter.level
+    ) {
+      props.history?.push(`?location=${filter.location}&level=${filter.level}`);
+    }
+  }, [filter.level, filter.location, props.history, query]);
 
   useEffect(() => {
     setFilteredCourses(
@@ -72,27 +84,18 @@ function App(props: Props) {
         return found;
       })
     );
-    if (location !== filter.location || level !== filter.level) {
-      props.history?.push(`/${filter.location}/${filter.level}`);
-    }
-  }, [
-    courses,
-    filter.level,
-    filter.location,
-    filter.onlyWithFreePlaces,
-    level,
-    location,
-    props.history,
-  ]);
+  }, [courses, filter.level, filter.location, filter.onlyWithFreePlaces]);
 
   async function getCourses() {
+    setIsLoading(true);
     const responseCourses = await getData<ResponseCourses>(
-      "https://integratsioon.ee/language-courses.json"
+      "https://api.allorigins.win/raw?url=https://integratsioon.ee/language-courses.json"
     );
     const courses = responseCourses.nodes.map((course) => course.node);
     setLocations(uniq(map(courses, "City/County")));
     setLevels(uniq(map(courses, "language course level")));
     setCourses(courses);
+    setIsLoading(false);
   }
 
   function onChangeFilter(key: string, value: unknown) {
@@ -110,7 +113,7 @@ function App(props: Props) {
           <Select
             value={filter.location}
             onChange={(event) => onChangeFilter("location", event.target.value)}
-            disabled={locations?.length === 0}
+            disabled={isLoading}
           >
             {locations?.map((location) => (
               <MenuItem key={`location-${location}`} value={location}>
@@ -124,7 +127,7 @@ function App(props: Props) {
           <Select
             value={filter.level}
             onChange={(event) => onChangeFilter("level", event.target.value)}
-            disabled={levels?.length === 0}
+            disabled={isLoading}
           >
             {levels?.map((level) => (
               <MenuItem key={`level-${level}`} value={level}>
@@ -141,13 +144,23 @@ function App(props: Props) {
                 onChange={(event) =>
                   onChangeFilter("onlyWithFreePlaces", event.target.checked)
                 }
+                disabled={isLoading}
               />
             }
             label="Only with free places"
           />
         </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            disabled={isLoading}
+            onClick={() => getCourses()}
+          >
+            Refresh
+          </Button>
+        </Grid>
       </Grid>
-
+      {isLoading && <LinearProgress />}
       <Grid container direction="column" spacing={2}>
         {filteredCourses?.map((course) => (
           <Grid item key={course.Nid}>
