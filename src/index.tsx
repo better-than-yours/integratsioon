@@ -8,10 +8,9 @@ import { BrowserRouter as Router, Route } from "react-router-dom";
 ReactDOM.render(
   <React.StrictMode>
     <Router>
-      <Route exact path="/">
+      <Route>
         <App />
       </Route>
-      <Route path="/:location/:level" children={<App />} />
     </Router>
   </React.StrictMode>,
   document.getElementById("root")

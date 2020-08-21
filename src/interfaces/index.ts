@@ -1,10 +1,10 @@
-export interface ResponseCourses {
+export interface IResponseCourses {
   nodes: {
-    node: Course;
+    node: ICourse;
   }[];
 }
 
-export interface Course {
+export interface ICourse {
   "City/County": string;
   Address: string;
   "City/County ID": string;
@@ -20,4 +20,10 @@ export interface Course {
   "description for tooltip": string;
   "Language level ID": string;
   Nid: string;
+}
+
+export interface IFilter {
+  onlyWithFreePlaces: boolean;
+  level: string;
+  location: string;
 }

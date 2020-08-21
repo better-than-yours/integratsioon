@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Course, ResponseCourses } from "./interfaces";
-import {
-  Grid,
-  Button,
-  InputLabel,
-  Select,
-  MenuItem,
-  FormControlLabel,
-  Checkbox,
-  LinearProgress,
-} from "@material-ui/core";
+import { Grid, LinearProgress } from "@material-ui/core";
 import map from "lodash/map";
 import uniq from "lodash/uniq";
 import { useLocation, withRouter } from "react-router-dom";
 import { History } from "history";
+import { ICourse, IResponseCourses, IFilter } from "./interfaces";
+import Course from "./components/Course";
+import Filters from "./components/Filters";
 
 async function getData<T>(url: string): Promise<T> {
   const response = await fetch(url, {
@@ -27,19 +20,13 @@ async function getData<T>(url: string): Promise<T> {
   return response.json();
 }
 
-interface Filter {
-  onlyWithFreePlaces: boolean;
-  level: string;
-  location: string;
-}
-
 interface Props {
   history: History;
 }
 
 function App(props: Props) {
   const query = new URLSearchParams(useLocation().search);
-  const [filter, setFilter] = useState<Filter>({
+  const [filter, setFilter] = useState<IFilter>({
     location: query.get("location") || "Tallinn",
     level: query.get("level") || "A1",
     onlyWithFreePlaces: true,
@@ -47,8 +34,8 @@ function App(props: Props) {
   const [isLoading, setIsLoading] = useState(true);
   const [levels, setLevels] = useState<string[]>([]);
   const [locations, setLocations] = useState<string[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [courses, setCourses] = useState<ICourse[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<ICourse[]>([]);
 
   useEffect(() => {
     if (courses.length === 0) {
@@ -88,7 +75,7 @@ function App(props: Props) {
 
   async function getCourses() {
     setIsLoading(true);
-    const responseCourses = await getData<ResponseCourses>(
+    const responseCourses = await getData<IResponseCourses>(
       "https://api.allorigins.win/raw?url=https://integratsioon.ee/language-courses.json"
     );
     const courses = responseCourses.nodes.map((course) => course.node);
@@ -107,95 +94,18 @@ function App(props: Props) {
 
   return (
     <div className="App">
-      <Grid container direction="row" spacing={2}>
-        <Grid item>
-          <InputLabel>Locations</InputLabel>
-          <Select
-            value={filter.location}
-            onChange={(event) => onChangeFilter("location", event.target.value)}
-            disabled={isLoading}
-          >
-            {locations?.map((location) => (
-              <MenuItem key={`location-${location}`} value={location}>
-                {location}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-        <Grid item>
-          <InputLabel>Levels</InputLabel>
-          <Select
-            value={filter.level}
-            onChange={(event) => onChangeFilter("level", event.target.value)}
-            disabled={isLoading}
-          >
-            {levels?.map((level) => (
-              <MenuItem key={`level-${level}`} value={level}>
-                {level}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-        <Grid item>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={filter.onlyWithFreePlaces}
-                onChange={(event) =>
-                  onChangeFilter("onlyWithFreePlaces", event.target.checked)
-                }
-                disabled={isLoading}
-              />
-            }
-            label="Only with free places"
-          />
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            disabled={isLoading}
-            onClick={() => getCourses()}
-          >
-            Refresh
-          </Button>
-        </Grid>
-      </Grid>
+      <Filters
+        isLoading={isLoading}
+        locations={locations}
+        levels={levels}
+        filter={filter}
+        onChangeFilter={onChangeFilter}
+        onRefresh={() => getCourses()}
+      />
       {isLoading && <LinearProgress />}
       <Grid container direction="column" spacing={2}>
         {filteredCourses?.map((course) => (
-          <Grid item key={course.Nid}>
-            <Grid item>
-              <b>{course["language course level"]}</b> {course.Address}
-            </Grid>
-            <Grid item>
-              {course["course start"]} - {course["course end"]}
-            </Grid>
-            <Grid item>{course["Additional info"]}</Grid>
-            <Grid item>{course["course description"]}</Grid>
-            <Grid item>
-              No of form Submissions: {course["No of form Submissions"]}
-            </Grid>
-            <Grid item>
-              Reserve group no of places: {course["Reserve group no of places"]}
-            </Grid>
-            <Grid item>
-              Main group no of places: {course["Main group no of places"]}
-            </Grid>
-            <Grid item>
-              {Number(course["Main group no of places"]) +
-                Number(course["Reserve group no of places"]) >
-              Number(course["No of form Submissions"]) ? (
-                <Button
-                  variant="contained"
-                  href={`https://integratsioon.ee${course["Button link"]}`}
-                >
-                  Registration
-                </Button>
-              ) : (
-                <b>No free places</b>
-              )}
-            </Grid>
-          </Grid>
+          <Course key={course.Nid} course={course} />
         ))}
       </Grid>
     </div>
