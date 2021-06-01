@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Grid, LinearProgress } from "@material-ui/core";
 import map from "lodash/map";
 import uniq from "lodash/uniq";
@@ -25,7 +25,8 @@ interface Props {
 }
 
 function App(props: Props) {
-  const query = new URLSearchParams(useLocation().search);
+  const { search } = useLocation();
+  const query = useMemo(() => new URLSearchParams(search), [search]);
   const [filter, setFilter] = useState<IFilter>({
     location: query.get("location") || "Tallinn",
     level: query.get("level") || "A1",
