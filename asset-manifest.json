@@ -1,20 +1,20 @@
 {
   "files": {
     "main.css": "/integratsioon/static/css/main.6dea0f05.chunk.css",
-    "main.js": "/integratsioon/static/js/main.55ca6cf3.chunk.js",
-    "main.js.map": "/integratsioon/static/js/main.55ca6cf3.chunk.js.map",
+    "main.js": "/integratsioon/static/js/main.9a7d8161.chunk.js",
+    "main.js.map": "/integratsioon/static/js/main.9a7d8161.chunk.js.map",
     "runtime-main.js": "/integratsioon/static/js/runtime-main.37ff6e3f.js",
     "runtime-main.js.map": "/integratsioon/static/js/runtime-main.37ff6e3f.js.map",
-    "static/js/2.01b57d19.chunk.js": "/integratsioon/static/js/2.01b57d19.chunk.js",
-    "static/js/2.01b57d19.chunk.js.map": "/integratsioon/static/js/2.01b57d19.chunk.js.map",
+    "static/js/2.0afe9f8f.chunk.js": "/integratsioon/static/js/2.0afe9f8f.chunk.js",
+    "static/js/2.0afe9f8f.chunk.js.map": "/integratsioon/static/js/2.0afe9f8f.chunk.js.map",
     "index.html": "/integratsioon/index.html",
     "static/css/main.6dea0f05.chunk.css.map": "/integratsioon/static/css/main.6dea0f05.chunk.css.map",
-    "static/js/2.01b57d19.chunk.js.LICENSE.txt": "/integratsioon/static/js/2.01b57d19.chunk.js.LICENSE.txt"
+    "static/js/2.0afe9f8f.chunk.js.LICENSE.txt": "/integratsioon/static/js/2.0afe9f8f.chunk.js.LICENSE.txt"
   },
   "entrypoints": [
     "static/js/runtime-main.37ff6e3f.js",
-    "static/js/2.01b57d19.chunk.js",
+    "static/js/2.0afe9f8f.chunk.js",
     "static/css/main.6dea0f05.chunk.css",
-    "static/js/main.55ca6cf3.chunk.js"
+    "static/js/main.9a7d8161.chunk.js"
   ]
 }
